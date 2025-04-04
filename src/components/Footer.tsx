@@ -142,9 +142,6 @@ export function Footer({ showAccessibilityStatement, setShowAccessibilityStateme
         <p>
           האתר מספק מידע ושירותים לרכישת רכבים, הצעות מחיר ויצירת קשר עם החברה.
         </p>
-        <p>
-          האתר מספק מידע ושירותים לרכישת רכבים, הצעות מחיר ויצירת קשר עם החברה.
-        </p>
         <h4 className="text-xl font-semibold mt-6">שימוש באתר</h4>
         <p>
           המשתמש מתחייב להשתמש באתר בהתאם לדין ולהימנע מכל שימוש לרעה.

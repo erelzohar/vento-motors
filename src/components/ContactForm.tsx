@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { 
+import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import {
   HiMiniTruck,
   HiMiniTag,
   HiMiniCalendar,
@@ -9,14 +10,199 @@ import {
   HiMiniUser,
   HiMiniPhone,
   HiMiniUserGroup,
-  HiMiniDocument
+  HiMiniDocument,
+  HiCheck
 } from 'react-icons/hi2';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-export function ContactForm() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+const s3Client = new S3Client({
+  region: import.meta.env.VITE_AWS_REGION,
+  credentials: {
+    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+  },
+});
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+function ContactFormContent() {
+  // const { executeRecaptcha } = useGoogleReCaptcha();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  async function getS3FileAsync(fileName: string) {
+    const getObjectParams = {
+      Bucket: import.meta.env.VITE_AWS_BUCKET_NAME,
+      Key: fileName
+    }
+    const command = new GetObjectCommand(getObjectParams)
+    const url = await getSignedUrl(s3Client, command, { expiresIn: 1800 });
+    return url;
+
+  }
+  const uploadToS3 = async (file: File): Promise<string> => {
+    try {
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(7);
+      const key = `licenses/${timestamp}-${randomString}.${fileExtension}`;
+
+      const arrayBuffer = await file.arrayBuffer();
+
+      const command = new PutObjectCommand({
+        Bucket: import.meta.env.VITE_AWS_BUCKET_NAME,
+        Key: key,
+        Body: arrayBuffer,
+        ContentType: file.type,
+      });
+
+      await s3Client.send(command);
+      return await getS3FileAsync(key);
+    } catch (error) {
+      // console.error('Error uploading to S3:', error);
+      throw new Error('Failed to upload file');
+    }
+  };
+
+  const onSubmit = async (data: any) => {
+    // if (!executeRecaptcha) {
+    //   console.error('Execute recaptcha not yet available');
+    //   return;
+    // }
+
+    setIsSubmitting(true);
+    setUploadError(null);
+
+    try {
+      // Execute reCAPTCHA
+      // const token = await executeRecaptcha('contact_form');
+
+      let fileType: 'img' | 'pdf' | null = null;
+      let fileUrl: string | null = null;
+
+      if (data.license && data.license[0]) {
+        const file = data.license[0];
+        const fileExtension = file.name.split('.').pop()?.toLowerCase();
+
+        if (file.type.startsWith('image/') || ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
+          fileType = 'img';
+        } else if (file.type === 'application/pdf' || fileExtension === 'pdf') {
+          fileType = 'pdf';
+        }
+
+        if (fileType) {
+          fileUrl = await uploadToS3(file);
+        }
+      }
+
+      const formData = {
+        ...data,
+        fileType,
+        fileUrl,
+        // recaptchaToken: token
+      };
+
+      const templateName = fileType === 'pdf' ? 'vento_lead_pdf' :
+        !fileType ? "vento_lead_blank" : "vento_lead";
+      const componentsArr = () => {
+        const arr = [];
+        if (fileType === 'pdf') arr.push({
+          "type": "header",
+          "parameters": [
+            {
+              "type": "document",
+              "document": {
+                "link": fileUrl,
+                "filename": data.license[0].name
+              }
+            }
+          ]
+        });
+        else if (fileType !== null) arr.push({
+          "type": "header",
+          "parameters": [
+            {
+              "type": "image",
+              "image": {
+                "link": fileUrl
+              }
+            }
+          ]
+        });
+
+        arr.push({
+          "type": "body",
+          "parameters": [
+            {
+              "type": "text",
+              "text": formData.name
+            },
+            {
+              "type": "text",
+              "text": formData.phone
+            },
+            {
+              "type": "text",
+              "text": formData.make
+            },
+            {
+              "type": "text",
+              "text": formData.model
+            },
+            {
+              "type": "text",
+              "text": formData.year
+            },
+            {
+              "type": "text",
+              "text": formData.hand
+            },
+            {
+              "type": "text",
+              "text": formData.mileage
+            }
+          ]
+        });
+        return arr;
+      }
+      const waRequest = {
+        "messaging_product": "whatsapp",
+        "to": "972556676599",
+        "type": "template",
+        "template": {
+          "name": templateName,
+          "language": {
+            "code": "he"
+          },
+          "components": componentsArr()
+        }
+      }
+      // Simulate API call
+      const res = await fetch("https://graph.facebook.com/v22.0/"+import.meta.env.VITE_WA_ACCOUNT_ID+"/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer "+import.meta.env.VITE_WA_ACCOUNT_TOKEN
+        },
+        body: JSON.stringify(waRequest),
+      });
+
+      const result = await res.json();
+
+      // console.log('Form data with file and recaptcha:', formData);
+      setIsSuccess(true);
+      reset();
+
+      setTimeout(() => {
+        setIsSuccess(false);
+      }, 3000);
+    } catch (error) {
+      // console.error('Error submitting form:', error);
+      setUploadError('שגיאה בשליחת הטופס. אנא נסה שנית.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Generate years array from 2000 to current year
@@ -46,7 +232,7 @@ export function ContactForm() {
           <div className="px-6 py-8 sm:p-10">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
-                <label htmlFor="make">יצרן הרכב</label>
+                <label htmlFor="make">יצרן </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
                     <HiMiniTruck className="h-5 w-5" />
@@ -56,7 +242,9 @@ export function ContactForm() {
                     id="make"
                     maxLength={30}
                     className="pr-10"
-                    {...register("make", { 
+                    placeholder="יצרן הרכב"
+                    disabled={isSubmitting}
+                    {...register("make", {
                       required: "שדה חובה",
                       maxLength: { value: 30, message: "מקסימום 30 תווים" }
                     })}
@@ -78,7 +266,9 @@ export function ContactForm() {
                     id="model"
                     maxLength={30}
                     className="pr-10"
-                    {...register("model", { 
+                    placeholder="דגם הרכב"
+                    disabled={isSubmitting}
+                    {...register("model", {
                       required: "שדה חובה",
                       maxLength: { value: 30, message: "מקסימום 30 תווים" }
                     })}
@@ -98,6 +288,7 @@ export function ContactForm() {
                   <select
                     id="year"
                     className="pr-10"
+                    disabled={isSubmitting}
                     {...register("year", {
                       required: "שדה חובה"
                     })}
@@ -124,6 +315,7 @@ export function ContactForm() {
                   <select
                     id="hand"
                     className="pr-10"
+                    disabled={isSubmitting}
                     {...register("hand", {
                       required: "שדה חובה"
                     })}
@@ -151,6 +343,8 @@ export function ContactForm() {
                     type="number"
                     id="mileage"
                     className="pr-10"
+                    placeholder="10000"
+                    disabled={isSubmitting}
                     {...register("mileage", {
                       required: "שדה חובה",
                       min: { value: 0, message: "קילומטראז' לא יכול להיות שלילי" }
@@ -163,7 +357,7 @@ export function ContactForm() {
               </div>
 
               <div>
-                <label htmlFor="license">רישיון רכב</label>
+                <label htmlFor="license">רישיון רכב (לא חובה)</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
                     <HiMiniDocument className="h-5 w-5" />
@@ -172,14 +366,16 @@ export function ContactForm() {
                     type="file"
                     id="license"
                     accept="image/*,.pdf"
+                    disabled={isSubmitting}
                     className="pr-10 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sunset/10 file:text-sunset hover:file:bg-sunset/20"
-                    {...register("license", {
-                      required: "שדה חובה"
-                    })}
+                    {...register("license")}
                   />
                 </div>
                 {errors.license && (
                   <p className="mt-1 text-sm text-red-600">{errors.license.message as string}</p>
+                )}
+                {uploadError && (
+                  <p className="mt-1 text-sm text-red-600">{uploadError}</p>
                 )}
               </div>
 
@@ -194,7 +390,9 @@ export function ContactForm() {
                     id="name"
                     maxLength={30}
                     className="pr-10"
-                    {...register("name", { 
+                    placeholder="ישראל ישראלי"
+                    disabled={isSubmitting}
+                    {...register("name", {
                       required: "שדה חובה",
                       maxLength: { value: 30, message: "מקסימום 30 תווים" }
                     })}
@@ -216,7 +414,9 @@ export function ContactForm() {
                     id="phone"
                     maxLength={10}
                     className="pr-10"
-                    {...register("phone", { 
+                    placeholder="05********"
+                    disabled={isSubmitting}
+                    {...register("phone", {
                       required: "שדה חובה",
                       pattern: {
                         value: /^05\d{8}$/,
@@ -230,16 +430,53 @@ export function ContactForm() {
                 )}
               </div>
 
-              <button
+              <motion.button
                 type="submit"
-                className="w-full btn-primary"
+                disabled={isSubmitting}
+                className={`w-full relative ${isSuccess ? 'bg-green-500' : 'btn-primary'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                initial={false}
+                animate={{
+                  backgroundColor: isSuccess ? '#22c55e' : '#FF4500'
+                }}
               >
-                שלח וקבל הצעה
-              </button>
+                <motion.span
+                  initial={false}
+                  animate={{
+                    opacity: isSubmitting ? 0 : 1,
+                    y: isSubmitting ? 10 : 0
+                  }}
+                >
+                  {isSuccess ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <HiCheck className="h-5 w-5" />
+                      הטופס נשלח בהצלחה
+                    </span>
+                  ) : (
+                    'שלח וקבל הצעה'
+                  )}
+                </motion.span>
+                {isSubmitting && (
+                  <motion.div
+                    className="absolute inset-0 flex items-center justify-center"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  </motion.div>
+                )}
+              </motion.button>
             </form>
           </div>
         </motion.div>
       </div>
     </section>
+  );
+}
+
+export function ContactForm() {
+  return (
+    <ContactFormContent />
+    // <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}>
+    // </GoogleReCaptchaProvider>
   );
 }

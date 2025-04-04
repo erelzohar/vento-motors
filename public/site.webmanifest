@@ -1,19 +1,19 @@
 {
   "name": "ונטו מוטורס | Vento Motors",
   "short_name": "ונטו מוטורס",
-  "description": "קנייה מיידית של רכבים במחיר הוגן",
+  "description": "ונטו קנייה מיידית של רכבים במחיר הוגן",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#FF4500",
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
+      "src": "/logo180.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/android-chrome-512x512.png",
+      "src": "/logo500.jpeg",
       "sizes": "512x512",
       "type": "image/png"
     }

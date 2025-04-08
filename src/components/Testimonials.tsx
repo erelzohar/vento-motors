@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import car1 from "../Assets/car1.webp";
+import car1 from "../Assets/car1.png";
 import car2 from "../Assets/car2.png";
 import car3 from "../Assets/car3.png";
 import car4 from "../Assets/car4.png";

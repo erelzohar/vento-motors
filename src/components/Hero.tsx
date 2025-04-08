@@ -19,7 +19,7 @@ export function Hero() {
   const [isMobile, setIsMobile] = useState(false);
 
   const whatsappNumber = '972556676599';
-  const whatsappText = 'היי, אני מעוניין למכור את הרכב שלי';
+  const whatsappText = 'שלום, אני מעוניין למכור את הרכב שלי';
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
   const phoneNumber = '0556676599';
 
@@ -93,7 +93,7 @@ export function Hero() {
       <div className="absolute inset-0 bg-mesh opacity-10"></div>
       <div className="absolute inset-0 bg-gradient-radial from-sunset/20 via-transparent to-transparent"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50"></div>
-      
+
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
         <div className="text-center">
@@ -105,7 +105,7 @@ export function Hero() {
           >
             <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-white/90 text-sm">
               <span className={`inline-block w-2 h-2 ${dotColor} rounded-full animate-pulse`}></span>
-              מקבלים הצעות ברגע זה
+              {isShabbat() && "לא "} מקבלים הצעות ברגע זה
             </span>
           </motion.div>
 
@@ -154,7 +154,7 @@ export function Hero() {
             >
               קבל הצעה עכשיו
             </button>
-            
+
             <div className="flex items-center gap-4 text-white/80">
               <div className="flex -space-x-2 rtl:space-x-reverse overflow-hidden">
                 {[1, 2, 3].map((i) => (

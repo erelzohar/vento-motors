@@ -1,47 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import car1 from "../Assets/car1.webp";
+import car2 from "../Assets/car2.png";
+import car3 from "../Assets/car3.png";
+import car4 from "../Assets/car4.png";
+import car5 from "../Assets/car5.png";
+import car6 from "../Assets/car6.png";
 export function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
   
   const testimonials = [
     {
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3AGE5avVnRX7q1TUJfdiMxJyiKV0zknMmfA&s",
+      image: car1,
       name: "דוד כהן",
       location: "תל אביב",
       quote: "תהליך מדהים. קיבלתי מחיר מעולה עבור הרכב והתשלום היה מיידי!",
       rating: 5
     },
     {
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNVCg_j8cNB48DP7ZfmPQOd3oG2T4W6qbkSw&s",
+      image: car2,
       name: "שרה מנחם",
       location: "ירושלים",
       quote: "הצוות של ונטו מוטורס עשה את מכירת הרכב לחוויה נטולת לחץ. ממליצה בחום!",
       rating: 5
     },
     {
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXVsmWqMhP8fNAieNDnU7mpQ-rT7PrqNngmw&s",
+      image: car3,
       name: "משה ישראלי",
       location: "חיפה",
       quote: "חוויית מכירת רכב הטובה ביותר. צוות מקצועי ושירות מצוין.",
       rating: 5
     },
     {
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5eBjInWr9P9i5mgi7JEu7BgG2eNWXwOrZVw&s",
+      image: car4,
       name: "רונית אברהם",
       location: "רמת גן",
       quote: "מכרתי את הרכב תוך יום אחד! שירות מעולה ומחיר הוגן.",
       rating: 5
     },
     {
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRm0GP2atdq2_ujMbcIAq9nB_eoPH2VyaomSQ&s",
+      image: car5,
       name: "יעקב לוי",
       location: "באר שבע",
       quote: "התהליך היה פשוט וקל. קיבלתי את התשלום באותו היום!",
       rating: 5
     },
     {
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSh_V4q_yXZ4Mg622hltf_PPb3SRSBBK17FRw&s",
+      image: car6,
       name: "מיכל דוד",
       location: "נתניה",
       quote: "שירות מקצועי ואדיב. ממליצה לכל מי שרוצה למכור רכב בקלות.",

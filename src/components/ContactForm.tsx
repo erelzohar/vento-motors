@@ -357,7 +357,7 @@ function ContactFormContent() {
               </div>
 
               <div>
-                <label htmlFor="license">רישיון רכב (לא חובה)</label>
+                <label htmlFor="license">רישיון רכב</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
                     <HiMiniDocument className="h-5 w-5" />

@@ -8,14 +8,14 @@
   "theme_color": "#FF4500",
   "icons": [
     {
-      "src": "/logo180.png",
+      "src": "/logo192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
       "src": "/logo500.jpeg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ],
   "dir": "rtl",

@@ -342,6 +342,7 @@ function ContactFormContent() {
                   <input
                     type="number"
                     id="mileage"
+                    min={0}
                     className="pr-10"
                     placeholder="10000"
                     disabled={isSubmitting}

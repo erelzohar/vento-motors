@@ -18,10 +18,10 @@ export function Hero() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  const whatsappNumber = '972556676599';
+  const whatsappNumber = '972529100123';
   const whatsappText = 'שלום, אני מעוניין למכור את הרכב שלי';
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
-  const phoneNumber = '0556676599';
+  const phoneNumber = '0529100123';
 
   useEffect(() => {
     const updateDotColor = () => {
@@ -57,7 +57,7 @@ export function Hero() {
     {
       name: 'Facebook',
       icon: <FaFacebook className="h-5 w-5" />,
-      href: 'https://www.facebook.com/share/1B5hpSBm8a/?mibextid=wwXIfr',
+      href: 'https://www.facebook.com/ventomotors',
       color: 'bg-[#1877F2] hover:bg-[#1877F2]/90'
     },
     {

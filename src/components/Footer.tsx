@@ -15,11 +15,11 @@ export function Footer({ showAccessibilityStatement, setShowAccessibilityStateme
   const [isMobile, setIsMobile] = useState(false);
   const [activeLegalModal, setActiveLegalModal] = useState<string | null>(null);
   
-  const whatsappNumber = '972556676599';
+  const whatsappNumber = '972529100123';
   const whatsappText = 'היי, אני מעוניין למכור את הרכב שלי';
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
-  const phoneNumber = '055-6676599';
-  const email = 'ventomotorsil@gmail.com';
+  const phoneNumber = '052-9100123';
+  const email = 'ventomotorsil@walla.com';
 
   useEffect(() => {
     const checkMobile = () => {
@@ -50,7 +50,7 @@ export function Footer({ showAccessibilityStatement, setShowAccessibilityStateme
     {
       name: 'Facebook',
       icon: <FaFacebook className="h-5 w-5" />,
-      href: 'https://www.facebook.com/share/1B5hpSBm8a/?mibextid=wwXIfr',
+      href: 'https://www.facebook.com/ventomotors',
       color: 'bg-[#1877F2] hover:bg-[#1877F2]/90'
     },
     {

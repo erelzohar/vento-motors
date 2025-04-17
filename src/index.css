@@ -13,7 +13,7 @@
   }
   
   body {
-    @apply antialiased text-gray-900 bg-white;
+    @apply antialiased text-gray-900 bg-white overflow-x-hidden;
   }
 
   input, textarea, select {
@@ -257,6 +257,17 @@
   .high-contrast .accessibility-button.active {
     background-color: white !important;
     color: black !important;
+  }
+
+  /* Widget Container Styles */
+  .widget-container {
+    @apply max-w-full;
+  }
+
+  .widget-container iframe,
+  .widget-container > div {
+    @apply max-w-full !important;
+    width: 100% !important;
   }
 }
 

@@ -168,7 +168,7 @@ function ContactFormContent() {
       }
       const waRequest = {
         "messaging_product": "whatsapp",
-        "to": "972556676599",
+        "to": "972529100123",
         "type": "template",
         "template": {
           "name": templateName,

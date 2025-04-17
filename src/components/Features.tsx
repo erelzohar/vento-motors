@@ -6,7 +6,7 @@ import { WhatsAppModal } from './WhatsAppModal';
 export function Features() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const whatsappNumber = '972556676599';
+  const whatsappNumber = '972529100123';
   const whatsappText = 'היי, אני מעוניין למכור את הרכב שלי';
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappText)}`;
 

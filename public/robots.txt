@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://vento-motors.com/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
+
+# Disallow specific paths
+Disallow: /admin/
+Disallow: /private/
+Disallow: /temp/
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*?*
+
+# Allow specific files
+Allow: /sitemap.xml
+Allow: /manifest.json
+Allow: /site.webmanifest

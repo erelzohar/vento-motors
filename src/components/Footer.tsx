@@ -5,12 +5,9 @@ import { motion } from 'framer-motion';
 import { WhatsAppModal } from './WhatsAppModal';
 import { LegalModal } from './LegalModal';
 
-interface FooterProps {
-  showAccessibilityStatement: boolean;
-  setShowAccessibilityStatement: (show: boolean) => void;
-}
 
-export function Footer({ showAccessibilityStatement, setShowAccessibilityStatement }: FooterProps) {
+
+export function Footer() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [activeLegalModal, setActiveLegalModal] = useState<string | null>(null);
@@ -31,13 +28,15 @@ export function Footer({ showAccessibilityStatement, setShowAccessibilityStateme
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Watch for showAccessibilityStatement changes
   useEffect(() => {
-    if (showAccessibilityStatement) {
-      setActiveLegalModal('accessibility');
-      setShowAccessibilityStatement(false);
-    }
-  }, [showAccessibilityStatement, setShowAccessibilityStatement]);
+    const checkMobile = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleWhatsAppClick = (e: React.MouseEvent) => {
     if (!isMobile) {
@@ -105,31 +104,6 @@ export function Footer({ showAccessibilityStatement, setShowAccessibilityStateme
         <h5 className="text-lg font-semibold">זכויות המשתמש</h5>
         <p>
           ניתן לפנות לחברה ולבקש מחיקת מידע אישי בהתאם לחוק הגנת הפרטיות.
-        </p>
-      </div>
-    ),
-    accessibility: (
-      <div className="space-y-4">
-        <h4 className="text-xl font-semibold">הצהרת נגישות</h4>
-        <p>
-          ונטו מוטורס מחויבת להנגשת האתר לכלל האוכלוסייה, כולל אנשים עם מוגבלויות, בהתאם לתקנות הנגישות.
-        </p>
-
-        <h5 className="text-lg font-semibold">אמצעים שננקטו</h5>
-        <ul className="list-disc list-inside space-y-2">
-          <li>אפשרות לשינוי גודל טקסט</li>
-          <li>התאמות צבעים לשיפור ניגודיות</li>
-          <li>אפשרות ניווט באמצעות מקלדת</li>
-        </ul>
-
-        <h5 className="text-lg font-semibold">פניות בנושא נגישות</h5>
-        <p>
-          במידה ומצאתם בעיה בנגישות האתר, ניתן לפנות אלינו בכתובת: {email} או בטלפון: {phoneNumber}
-        </p>
-
-        <h5 className="text-lg font-semibold">תאריך עדכון אחרון</h5>
-        <p>
-          הצהרת הנגישות עודכנה לאחרונה בתאריך 01.02.2024
         </p>
       </div>
     ),
@@ -225,8 +199,7 @@ export function Footer({ showAccessibilityStatement, setShowAccessibilityStateme
           <div>
             <h4 className="text-lg font-semibold mb-4">שעות פעילות</h4>
             <ul className="space-y-2 text-gray-400">
-              <li>ראשון - חמישי: 8:00 - 00:00</li>
-              <li>שישי: 8:00 - 18:00</li>
+              <li>ראשון - שישי: 8:00 - 18:00</li>
               <li>שבת: סגור</li>
             </ul>
           </div>
@@ -239,13 +212,6 @@ export function Footer({ showAccessibilityStatement, setShowAccessibilityStateme
               className="text-gray-400 hover:text-sunset transition-colors"
             >
               מדיניות פרטיות
-            </button>
-            <span className="text-gray-600">|</span>
-            <button
-              onClick={() => setActiveLegalModal('accessibility')}
-              className="text-gray-400 hover:text-sunset transition-colors"
-            >
-              הצהרת נגישות
             </button>
             <span className="text-gray-600">|</span>
             <button
@@ -283,13 +249,6 @@ export function Footer({ showAccessibilityStatement, setShowAccessibilityStateme
         onClose={() => setActiveLegalModal(null)}
         title="מדיניות פרטיות"
         content={legalContent.privacy}
-      />
-
-      <LegalModal
-        isOpen={activeLegalModal === 'accessibility'}
-        onClose={() => setActiveLegalModal(null)}
-        title="הצהרת נגישות"
-        content={legalContent.accessibility}
       />
 
       <LegalModal

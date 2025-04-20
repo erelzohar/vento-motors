@@ -7,11 +7,9 @@ import { Stats } from './components/Stats';
 import { Testimonials } from './components/Testimonials';
 import { ContactForm } from './components/ContactForm';
 import { Footer } from './components/Footer';
-import { AccessibilityWidget } from './components/AccessibilityWidget/AccessibilityWidget';
 
 function App() {
   const [activeSection, setActiveSection] = useState('hero');
-  const [showAccessibilityStatement, setShowAccessibilityStatement] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -44,31 +42,23 @@ function App() {
     }
   };
 
-  const openAccessibilityStatement = () => {
-    setShowAccessibilityStatement(true);
-  };
-
   return (
     <div className="min-h-screen bg-white">
       <Navbar
         activeSection={activeSection}
         scrollToSection={scrollToSection}
       />
-      <div id="content-container">
+      <div>
         <Hero />
         <Features />
         <Process />
         <Stats />
         <Testimonials />
         <ContactForm />
-        <Footer 
-          showAccessibilityStatement={showAccessibilityStatement} 
-          setShowAccessibilityStatement={setShowAccessibilityStatement} 
-        />
+        <Footer />
       </div>
-      <AccessibilityWidget openAccessibilityStatement={() => setShowAccessibilityStatement(true)} />
     </div>
   );
 }
 
-export default App;
+export default App

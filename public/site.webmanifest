@@ -13,9 +13,9 @@
       "type": "image/png"
     },
     {
-      "src": "/logo500.jpeg",
+      "src": "/logo500.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png"
     }
   ],
   "dir": "rtl",

@@ -4,10 +4,9 @@
 
 /* accesibilty style */
 #NagishLiBarStrip{
-  border-radius: 20px 0 0 20px;
+  border-radius: 70px;
 }
-#NagishLiBar{
-}
+
 
 @layer base {
   html {

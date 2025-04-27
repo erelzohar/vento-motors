@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
@@ -25,7 +25,7 @@ const s3Client = new S3Client({
 });
 
 function ContactFormContent() {
-  // const { executeRecaptcha } = useGoogleReCaptcha();
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -60,24 +60,24 @@ function ContactFormContent() {
       await s3Client.send(command);
       return await getS3FileAsync(key);
     } catch (error) {
-      // console.error('Error uploading to S3:', error);
       throw new Error('Failed to upload file');
     }
   };
 
   const onSubmit = async (data: any) => {
-    // if (!executeRecaptcha) {
-    //   console.error('Execute recaptcha not yet available');
-    //   return;
-    // }
+
+    if (!executeRecaptcha) {
+      setUploadError("Execute recaptcha not yet available");
+      return;
+    }
 
     setIsSubmitting(true);
     setUploadError(null);
 
     try {
       // Execute reCAPTCHA
-      // const token = await executeRecaptcha('contact_form');
-
+      const token = await executeRecaptcha('contact_form');
+      if (!token) return setUploadError("שגיאה בשליחת הטופס");
       let fileType: 'img' | 'pdf' | null = null;
       let fileUrl: string | null = null;
 
@@ -100,7 +100,7 @@ function ContactFormContent() {
         ...data,
         fileType,
         fileUrl,
-        // recaptchaToken: token
+        recaptchaToken: token
       };
 
       const templateName = fileType === 'pdf' ? 'vento_lead_pdf' :
@@ -178,7 +178,6 @@ function ContactFormContent() {
           "components": componentsArr()
         }
       }
-      // Simulate API call
       const res = await fetch("https://graph.facebook.com/v22.0/"+import.meta.env.VITE_WA_ACCOUNT_ID+"/messages", {
         method: "POST",
         headers: {
@@ -188,9 +187,8 @@ function ContactFormContent() {
         body: JSON.stringify(waRequest),
       });
 
-      const result = await res.json();
+      
 
-      // console.log('Form data with file and recaptcha:', formData);
       setIsSuccess(true);
       reset();
 
@@ -198,7 +196,6 @@ function ContactFormContent() {
         setIsSuccess(false);
       }, 3000);
     } catch (error) {
-      // console.error('Error submitting form:', error);
       setUploadError('שגיאה בשליחת הטופס. אנא נסה שנית.');
     } finally {
       setIsSubmitting(false);
@@ -387,6 +384,7 @@ function ContactFormContent() {
                     <HiMiniUser className="h-5 w-5" />
                   </div>
                   <input
+                    autoComplete="name"
                     type="text"
                     id="name"
                     maxLength={30}
@@ -411,6 +409,7 @@ function ContactFormContent() {
                     <HiMiniPhone className="h-5 w-5" />
                   </div>
                   <input
+                    autoComplete="tel"
                     type="tel"
                     id="phone"
                     maxLength={10}
@@ -476,8 +475,8 @@ function ContactFormContent() {
 
 export function ContactForm() {
   return (
-    <ContactFormContent />
-    // <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}>
-    // </GoogleReCaptchaProvider>
+    <GoogleReCaptchaProvider reCaptchaKey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}>
+      <ContactFormContent />
+    </GoogleReCaptchaProvider>
   );
 }

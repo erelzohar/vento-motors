@@ -34,9 +34,11 @@ export function LocalVideoModal({ isOpen, onClose, videoSrc }: LocalVideoModalPr
 
                         <video
                             src={videoSrc}
-                            controls
                             autoPlay
                             muted
+                            playsInline
+                            loop
+                            controls
                             className="max-h-[90vh] max-w-full rounded-xl object-contain"
                         />
                     </motion.div>

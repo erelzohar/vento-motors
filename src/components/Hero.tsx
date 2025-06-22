@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaFacebook, FaInstagram, FaWhatsapp, FaTiktok, FaPhone } from 'react-icons/fa';
 import { WhatsAppModal } from './WhatsAppModal';
+import { LocalVideoModal } from './LocalVideoModal';
 
 function isShabbat() {
   const now = new Date();
@@ -16,6 +17,7 @@ function isShabbat() {
 export function Hero() {
   const [dotColor, setDotColor] = useState('bg-green-500');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
   const whatsappNumber = '972529100123';
@@ -221,6 +223,11 @@ export function Hero() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         whatsappLink={whatsappLink}
+      />
+      <LocalVideoModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        videoSrc="https://d3b1lesihyajax.cloudfront.net/video.mp4"
       />
     </section>
   );

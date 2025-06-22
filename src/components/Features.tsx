@@ -72,6 +72,15 @@ export function Features() {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold">קצת עלינו</h2>
           <div className="mt-4 h-1 w-24 bg-sunset mx-auto rounded-full"></div>
+          <video
+            src="https://d3b1lesihyajax.cloudfront.net/video.mp4"
+            autoPlay
+            muted
+            playsInline
+            loop
+            controls
+            className="max-h-[90vh] max-w-full rounded-xl object-contain m-auto mt-2"
+          />
           <div className="mt-6 space-y-6 text-lg max-w-3xl mx-auto">
             <p className="leading-relaxed">
               ונטו היא לא סוכנות רכב – אנחנו שירות מהיר ויעיל למי שרוצה למכור את הרכב שלו מידית וללא מאמץ.

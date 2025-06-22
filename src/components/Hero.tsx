@@ -224,11 +224,6 @@ export function Hero() {
         onClose={() => setIsModalOpen(false)}
         whatsappLink={whatsappLink}
       />
-      <LocalVideoModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        videoSrc="https://d3b1lesihyajax.cloudfront.net/video.mp4"
-      />
     </section>
   );
 }

@@ -95,6 +95,7 @@ function ContactFormContent() {
           fileUrl = await uploadToS3(file);
         }
       }
+      //console.log(data);
 
       const formData = {
         ...data,
@@ -166,28 +167,56 @@ function ContactFormContent() {
         });
         return arr;
       }
+      // const waRequest = {
+      //   "messaging_product": "whatsapp",
+      //   "to": "972529100123",
+      //   "type": "template",
+      //   "template": {
+      //     "name": templateName,
+      //     "language": {
+      //       "code": "he"
+      //     },
+      //     "components": componentsArr()
+      //   }
+      // }
+      // const res = await fetch("https://graph.facebook.com/v22.0/"+import.meta.env.VITE_WA_ACCOUNT_ID+"/messages", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     "Authorization": "Bearer "+import.meta.env.VITE_WA_ACCOUNT_TOKEN
+      //   },
+      //   body: JSON.stringify(waRequest),
+      // });
       const waRequest = {
-        "messaging_product": "whatsapp",
-        "to": "972529100123",
-        "type": "template",
-        "template": {
-          "name": templateName,
-          "language": {
-            "code": "he"
-          },
-          "components": componentsArr()
-        }
+        "data": {
+          "body_variables": [
+            formData.name,
+            formData.phone,
+            formData.make,
+            formData.model,
+            formData.year,
+            formData.hand,
+            formData.mileage
+          ]
+        },
+        "recipients": [
+          {
+            "whatsapp_number": "+972529100123",
+            "replace": false
+          }
+        ]
       }
-      const res = await fetch("https://graph.facebook.com/v22.0/"+import.meta.env.VITE_WA_ACCOUNT_ID+"/messages", {
+      //console.log(JSON.stringify(waRequest));
+
+      const res = await fetch("https://app.wanotifier.com/api/v1/notifications/jKuErPCYie?key=" + import.meta.env.VITE_WANOTIF_TOKEN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer "+import.meta.env.VITE_WA_ACCOUNT_TOKEN
         },
         body: JSON.stringify(waRequest),
       });
 
-      
+      //console.log(res.body?.getReader().read());
 
       setIsSuccess(true);
       reset();

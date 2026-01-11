@@ -17,7 +17,7 @@ class ProductionGlobals extends Globals {
     public messagingUrl = "https://vento-motors-back.onrender.com/api/messaging/whatsapp/template";
     public imagesUrl = "https://vento-motors-back.onrender.com/api/images/";
     // public typesUrl = "https://api.ez-lines.com/api/appointment-types/";
-    public phone = "972584006014"
+    public phone = "972529100123"
 }
 
 const globals = process.env.NODE_ENV === "production" ? new ProductionGlobals() : new DevelopmentGlobals();

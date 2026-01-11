@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import globals from '../globals';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import {
   HiMiniTruck,
@@ -13,16 +14,16 @@ import {
   HiMiniDocument,
   HiCheck
 } from 'react-icons/hi2';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+// import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+// import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-const s3Client = new S3Client({
-  region: import.meta.env.VITE_AWS_REGION,
-  credentials: {
-    accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
-    secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
-  },
-});
+// const s3Client = new S3Client({
+//   region: import.meta.env.VITE_AWS_REGION,
+//   credentials: {
+//     accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY_ID,
+//     secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY,
+//   },
+// });
 
 function ContactFormContent() {
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -31,34 +32,43 @@ function ContactFormContent() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  async function getS3FileAsync(fileName: string) {
-    const getObjectParams = {
-      Bucket: import.meta.env.VITE_AWS_BUCKET_NAME,
-      Key: fileName
-    }
-    const command = new GetObjectCommand(getObjectParams)
-    const url = await getSignedUrl(s3Client, command, { expiresIn: 1800 });
-    return url;
 
-  }
   const uploadToS3 = async (file: File): Promise<string> => {
     try {
-      const fileExtension = file.name.split('.').pop()?.toLowerCase();
-      const timestamp = Date.now();
-      const randomString = Math.random().toString(36).substring(7);
-      const key = `licenses/${timestamp}-${randomString}.${fileExtension}`;
-
-      const arrayBuffer = await file.arrayBuffer();
-
-      const command = new PutObjectCommand({
-        Bucket: import.meta.env.VITE_AWS_BUCKET_NAME,
-        Key: key,
-        Body: arrayBuffer,
-        ContentType: file.type,
+      const formData = new FormData()
+      formData.append('file', file);
+      const res = await fetch(globals.imagesUrl, {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer "+import.meta.env.VITE_SERVER_TOKEN
+        },
+        body: formData,
       });
 
-      await s3Client.send(command);
-      return await getS3FileAsync(key);
+
+      // const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      // const timestamp = Date.now();
+      // const randomString = Math.random().toString(36).substring(7);
+      // const key = `licenses/${timestamp}-${randomString}.${fileExtension}`;
+
+      // const arrayBuffer = await file.arrayBuffer();
+
+      // const command = new PutObjectCommand({
+      //   Bucket: import.meta.env.VITE_AWS_BUCKET_NAME,
+      //   Key: key,
+      //   Body: arrayBuffer,
+      //   ContentType: file.type,
+      // });
+      if (res.ok) {
+        const response = await res.json();
+        
+        const url = response.data?.url;
+        if (url) return url;
+        else throw new Error('Failed to upload file');
+      }
+      else throw new Error('Failed to upload file');
+      // await s3Client.send(command);
+      // return await getS3FileAsync(key);
     } catch (error) {
       throw new Error('Failed to upload file');
     }
@@ -95,7 +105,6 @@ function ContactFormContent() {
           fileUrl = await uploadToS3(file);
         }
       }
-      //console.log(data);
 
       const formData = {
         ...data,
@@ -104,8 +113,8 @@ function ContactFormContent() {
         recaptchaToken: token
       };
 
-      const templateName = fileType === 'pdf' ? 'vento_lead_pdf' :
-        !fileType ? "vento_lead_blank" : "vento_lead";
+      const templateName = fileType === 'pdf' ? 'vento_pdf_lead' :
+        !fileType ? "vento_lead_blank" : "vento_image_lead";
       const componentsArr = () => {
         const arr = [];
         if (fileType === 'pdf') arr.push({
@@ -167,54 +176,50 @@ function ContactFormContent() {
         });
         return arr;
       }
-      // const waRequest = {
-      //   "messaging_product": "whatsapp",
-      //   "to": "972529100123",
-      //   "type": "template",
-      //   "template": {
-      //     "name": templateName,
-      //     "language": {
-      //       "code": "he"
-      //     },
-      //     "components": componentsArr()
-      //   }
-      // }
-      // const res = await fetch("https://graph.facebook.com/v22.0/"+import.meta.env.VITE_WA_ACCOUNT_ID+"/messages", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     "Authorization": "Bearer "+import.meta.env.VITE_WA_ACCOUNT_TOKEN
-      //   },
-      //   body: JSON.stringify(waRequest),
-      // });
       const waRequest = {
-        "data": {
-          "body_variables": [
-            formData.name,
-            formData.phone,
-            formData.make,
-            formData.model,
-            formData.year,
-            formData.hand,
-            formData.mileage
-          ]
-        },
-        "recipients": [
-          {
-            "whatsapp_number": "+972529100123",
-            "replace": false
-          }
-        ]
+        "to": globals.phone,
+        "templateName": templateName,
+        "code": "he",
+        "components": componentsArr()
       }
-      //console.log(JSON.stringify(waRequest));
 
-      const res = await fetch("https://app.wanotifier.com/api/v1/notifications/jKuErPCYie?key=" + import.meta.env.VITE_WANOTIF_TOKEN, {
+      const res = await fetch(globals.messagingUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": "Bearer "+import.meta.env.VITE_SERVER_TOKEN
         },
         body: JSON.stringify(waRequest),
       });
+
+      // const waRequest = {
+      //   "data": {
+      //     "body_variables": [
+      //       formData.name,
+      //       formData.phone,
+      //       formData.make,
+      //       formData.model,
+      //       formData.year,
+      //       formData.hand,
+      //       formData.mileage
+      //     ]
+      //   },
+      //   "recipients": [
+      //     {
+      //       "whatsapp_number": "+972529100123",
+      //       "replace": false
+      //     }
+      //   ]
+      // }
+      // //console.log(JSON.stringify(waRequest));
+
+      // const res = await fetch("https://app.wanotifier.com/api/v1/notifications/jKuErPCYie?key=" + import.meta.env.VITE_WANOTIF_TOKEN, {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(waRequest),
+      // });
 
       //console.log(res.body?.getReader().read());
 

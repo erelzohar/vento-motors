@@ -159,6 +159,14 @@
   }
 }
 
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Elfsight's sliding bullets assume LTR; under RTL the active dot drifts out of view */
 .widget-container .es-bullets-control-container {
   direction: ltr;

@@ -2,6 +2,7 @@ abstract class Globals {
     public imagesUrl:string;
     public messagingUrl:string;
     public phone:string;
+    public reviewsUrl:string;
     // public typesUrl:string;
 }
 
@@ -9,6 +10,7 @@ class DevelopmentGlobals extends Globals {
     public messagingUrl = "http://localhost:3000/api/messaging/whatsapp/template";
     // public typesUrl = "http://localhost:3000/api/appointment-types/";
     public imagesUrl = "http://localhost:3000/api/images/";
+    public reviewsUrl = "http://localhost:3000/api/reviews";
     public phone = "972584006014"
 }
 
@@ -16,6 +18,7 @@ class DevelopmentGlobals extends Globals {
 class ProductionGlobals extends Globals {
     public messagingUrl = "https://vento-motors-back.onrender.com/api/messaging/whatsapp/template";
     public imagesUrl = "https://vento-motors-back.onrender.com/api/images/";
+    public reviewsUrl = "https://vento-motors-back.onrender.com/api/reviews";
     // public typesUrl = "https://api.ez-lines.com/api/appointment-types/";
     public phone = "972529100123"
 }

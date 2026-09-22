@@ -159,6 +159,11 @@
   }
 }
 
+/* Elfsight's sliding bullets assume LTR; under RTL the active dot drifts out of view */
+.widget-container .es-bullets-control-container {
+  direction: ltr;
+}
+
 /* RTL specific adjustments */
 [dir="rtl"] .nav-link::after {
   @apply right-0 left-auto;

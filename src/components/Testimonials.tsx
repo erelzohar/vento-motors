@@ -18,7 +18,7 @@ export function Testimonials() {
           <div className="h-1 w-24 bg-sunset mx-auto rounded-full"></div>
         </div>
 
-        <div className="relative widget-container overflow-hidden">
+        <div className="relative widget-container overflow-hidden px-6">
           <div className="elfsight-app-cc630dad-0dd6-4e7c-97a3-1efe801504b1 w-full" data-elfsight-app-lazy></div>
         </div>
       </div>

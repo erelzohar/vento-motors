@@ -25,6 +25,8 @@ import {
 //   },
 // });
 
+const ADS_CONVERSION_SEND_TO = 'AW-18449387813/D8IkCLzJyoAdEKWird1E';
+
 function ContactFormContent() {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
@@ -222,6 +224,11 @@ function ContactFormContent() {
       // });
 
       //console.log(res.body?.getReader().read());
+
+      if (!res.ok) throw new Error(`Messaging failed: ${res.status}`);
+
+      // Google Ads lead conversion — only after the lead reached WhatsApp
+      (window as any).gtag?.('event', 'conversion', { send_to: ADS_CONVERSION_SEND_TO });
 
       setIsSuccess(true);
       reset();

@@ -159,6 +159,26 @@
   }
 }
 
+/* #hash navigation: smooth scrolling, clear of the fixed navbar (h-20) */
+html {
+  scroll-behavior: smooth;
+}
+
+section[id] {
+  scroll-margin-top: 80px;
+}
+
+/* The navbar floats over the hero, so #hero should land at the very top */
+#hero {
+  scroll-margin-top: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 .no-scrollbar {
   scrollbar-width: none;
 }

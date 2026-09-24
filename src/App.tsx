@@ -30,24 +30,12 @@ function App() {
     return () => observer.disconnect();
   }, []);
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const navHeight = 64;
-      const elementPosition = element.offsetTop - navHeight;
-      window.scrollTo({
-        top: elementPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
+  // Navigation is plain #hash anchors: the browser handles scrolling,
+  // history and deep links (see scroll-behavior / scroll-margin-top in index.css)
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar
-        activeSection={activeSection}
-        scrollToSection={scrollToSection}
-      />
+      <Navbar activeSection={activeSection} />
       <div>
         <Hero />
         <Features />

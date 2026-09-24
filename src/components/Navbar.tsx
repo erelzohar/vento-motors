@@ -4,10 +4,16 @@ import { HiMenu, HiX } from 'react-icons/hi';
 
 interface NavbarProps {
   activeSection: string;
-  scrollToSection: (id: string) => void;
 }
 
-export function Navbar({ activeSection, scrollToSection }: NavbarProps) {
+const NAV_ITEMS = [
+  { name: 'בית', id: 'hero' },
+  { name: 'קצת עלינו', id: 'features' },
+  { name: 'איך מתחילים', id: 'process' },
+  { name: 'קבל הצעה', id: 'contact-form' }
+];
+
+export function Navbar({ activeSection }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { scrollY } = useScroll();
 
@@ -45,20 +51,16 @@ export function Navbar({ activeSection, scrollToSection }: NavbarProps) {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-12">
-            {[
-              { name: 'בית', id: 'hero' },
-              { name: 'קצת עלינו', id: 'features' },
-              { name: 'איך מתחילים ', id: 'process' },
-              { name: 'קבל הצעה ', id: 'contact-form' }
-            ].map((item) => (
-              <motion.button
+            {NAV_ITEMS.map((item) => (
+              <motion.a
                 key={item.id}
+                href={`#${item.id}`}
                 style={{ color: navTextColor }}
-                onClick={() => scrollToSection(item.id)}
+                aria-current={activeSection === item.id ? 'true' : undefined}
                 className={`nav-link ${activeSection === item.id ? 'text-sunset' : ''}`}
               >
                 {item.name}
-              </motion.button>
+              </motion.a>
             ))}
           </div>
 
@@ -84,21 +86,18 @@ export function Navbar({ activeSection, scrollToSection }: NavbarProps) {
             exit={{ opacity: 0, y: -10 }}
             className="md:hidden py-2 bg-white shadow-lg rounded-b-lg"
           >
-            {[
-              { name: 'בית', id: 'hero' },
-              { name: 'קצת עלינו ', id: 'features' },
-              { name: 'איך מתחילים  ', id: 'process' },
-              { name: 'קבל הצעה ', id: 'contact-form' }
-            ].map((item) => (
-              <button
+            {NAV_ITEMS.map((item) => (
+              <a
                 key={item.id}
-                onClick={() => {scrollToSection(item.id);setIsMenuOpen(false);}}
+                href={`#${item.id}`}
+                onClick={() => setIsMenuOpen(false)}
+                aria-current={activeSection === item.id ? 'true' : undefined}
                 className={`block w-full text-right px-4 py-2 text-gray-700 hover:bg-gray-50 ${
                   activeSection === item.id ? 'text-sunset bg-gray-50' : ''
                 }`}
               >
                 {item.name}
-              </button>
+              </a>
             ))}
           </motion.div>
         )}

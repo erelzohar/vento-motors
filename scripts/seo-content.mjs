@@ -73,11 +73,21 @@ const list = (items) =>
     .map(([title, text]) => `<li><strong>${escapeHtml(title)}</strong> — ${escapeHtml(text)}</li>`)
     .join('\n        ');
 
+// Hides the block below before the first paint when JS is available, so users
+// never see it; crawlers without JS still get plain, visible markup.
+// Must go in <head>, above the block it hides.
+export function buildHideScript() {
+  return [
+    '<style>.js #seo-prerender{display:none}</style>',
+    '<script>document.documentElement.className+=" js"</script>'
+  ].join('\n  ');
+}
+
 // Rendered into #root. React replaces it on mount, so it only ever reaches
 // crawlers and anyone whose JavaScript has not loaded yet.
 export function buildBody() {
   return `
-      <div class="mx-auto max-w-7xl px-4 py-16 text-center">
+      <div id="seo-prerender" class="mx-auto max-w-7xl px-4 py-16 text-center">
         <h1 class="text-4xl font-bold">${escapeHtml(hero.title)}</h1>
         ${hero.lines.map((line) => `<p class="mt-4 text-lg">${escapeHtml(line)}</p>`).join('\n        ')}
         <p class="mt-6"><a href="#contact-form" class="font-semibold text-sunset">${escapeHtml(hero.cta)}</a></p>

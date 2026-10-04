@@ -4,7 +4,7 @@
 // adds JSON-LD, then React replaces it on mount.
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { buildBody, buildHead } from './seo-content.mjs';
+import { buildBody, buildHead, buildHideScript } from './seo-content.mjs';
 
 const dist = resolve(process.cwd(), 'dist');
 const indexPath = resolve(dist, 'index.html');
@@ -26,7 +26,7 @@ if (!html.includes('</head>')) {
 
 const prerendered = html
   .replace('<div id="root"></div>', `<div id="root">\n${buildBody()}\n    </div>`)
-  .replace('</head>', `  ${buildHead()}\n</head>`);
+  .replace('</head>', `  ${buildHead()}\n  ${buildHideScript()}\n</head>`);
 
 await writeFile(indexPath, prerendered);
 

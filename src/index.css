@@ -147,16 +147,6 @@
            bg-gradient-to-r from-sunset/20 to-transparent -translate-x-1/2;
   }
 
-  /* Widget Container Styles */
-  .widget-container {
-    @apply max-w-full;
-  }
-
-  .widget-container iframe,
-  .widget-container > div {
-    @apply max-w-full !important;
-    width: 100% !important;
-  }
 }
 
 /* #hash navigation: smooth scrolling, clear of the fixed navbar (h-20) */
@@ -185,11 +175,6 @@ section[id] {
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
-}
-
-/* Elfsight's sliding bullets assume LTR; under RTL the active dot drifts out of view */
-.widget-container .es-bullets-control-container {
-  direction: ltr;
 }
 
 /* RTL specific adjustments */

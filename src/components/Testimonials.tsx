@@ -1,30 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { FaFacebook, FaStar, FaThumbsUp, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import globals from '../globals';
+import { FaFacebook, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import reviewsData from '../data/reviews.json';
 
+// A snapshot of the Facebook page's reviews, refreshed by `node scripts/fetch-reviews.mjs`
 interface Review {
+  id: string;
   name: string | null;
-  picture: string | null;
-  text: string;
   rating: number | null;
+  text: string;
+  url: string;
   createdTime: string;
 }
 
-const ELFSIGHT_APP_ID = 'cc630dad-0dd6-4e7c-97a3-1efe801504b1';
+const reviews = reviewsData as Review[];
+const FACEBOOK_REVIEWS_URL = 'https://www.facebook.com/ventomotors/reviews';
 const dateFormat = new Intl.DateTimeFormat('he-IL', { day: 'numeric', month: 'long', year: 'numeric' });
 
+const rated = reviews.filter((r) => r.rating);
+const averageRating = rated.length ? rated.reduce((sum, r) => sum + (r.rating ?? 0), 0) / rated.length : null;
+
 export function Testimonials() {
-  // null = loading, 'fallback' = API unavailable → Elfsight widget
-  const [reviews, setReviews] = useState<Review[] | 'fallback' | null>(null);
-
-  useEffect(() => {
-    fetch(globals.reviewsUrl, { signal: AbortSignal.timeout(8000) })
-      .then(res => res.ok ? res.json() : Promise.reject(new Error(`${res.status}`)))
-      .then(body => setReviews(body.data?.length ? body.data : 'fallback'))
-      .catch(() => setReviews('fallback'));
-  }, []);
-
   return (
     <section className="relative py-16">
       {/* Background Image with Overlay */}
@@ -38,14 +34,28 @@ export function Testimonials() {
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-white mb-4">מה הלקוחות אומרים</h2>
           <div className="h-1 w-24 bg-sunset mx-auto rounded-full"></div>
+          <a
+            href={FACEBOOK_REVIEWS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${averageRating ? `דירוג ${averageRating.toFixed(1)} מתוך 5, ` : ''}${reviews.length} ביקורות בפייסבוק`}
+            className="mt-6 inline-flex items-center gap-2 text-white/80 transition-colors hover:text-white"
+          >
+            <FaFacebook className="h-5 w-5 text-[#1877F2]" />
+            {averageRating && (
+              <span className="inline-flex items-center gap-1 font-semibold text-white">
+                <FaStar className="h-4 w-4 text-yellow-400" />
+                {averageRating.toFixed(1)}
+              </span>
+            )}
+            <span>{reviews.length} ביקורות בפייסבוק</span>
+          </a>
         </div>
 
-        {reviews === null && <div className="h-72" aria-busy="true" />}
-        {reviews === 'fallback' && <ElfsightReviews />}
-        {Array.isArray(reviews) && <ReviewsCarousel reviews={reviews} />}
+        <ReviewsCarousel reviews={reviews} />
       </div>
     </section>
   );
@@ -85,7 +95,7 @@ function ReviewsCarousel({ reviews }: { reviews: Review[] }) {
         onScroll={updateEdges}
         className="flex gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2"
       >
-        {reviews.map((review, i) => <ReviewCard key={`${review.createdTime}-${i}`} review={review} />)}
+        {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
       </div>
 
       <CarouselArrow side="right" label="הביקורות הקודמות" disabled={atStart} onClick={() => scrollPage(-1)} />
@@ -121,19 +131,15 @@ function CarouselArrow({ side, label, disabled, onClick }: {
 function ReviewCard({ review }: { review: Review }) {
   const [expanded, setExpanded] = useState(false);
   const isLong = review.text.length > 180;
+  const name = review.name ?? 'לקוח/ה מפייסבוק';
 
   return (
     <article className="snap-start shrink-0 w-[85%] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] flex flex-col rounded-2xl bg-white/10 p-6 text-white backdrop-blur-sm">
-      {review.rating ? (
+      {review.rating && (
         <div className="flex gap-1 text-yellow-400" aria-label={`${review.rating} כוכבים`}>
           {Array.from({ length: 5 }, (_, i) => (
             <FaStar key={i} className={clsx('h-4 w-4', i >= review.rating! && 'text-white/20')} />
           ))}
-        </div>
-      ) : (
-        <div className="flex items-center gap-2 text-sm font-medium text-sunset-light">
-          <FaThumbsUp className="h-4 w-4" />
-          ממליץ/ה על ונטו מוטורס
         </div>
       )}
 
@@ -151,53 +157,40 @@ function ReviewCard({ review }: { review: Review }) {
       )}
 
       <footer className="mt-auto flex items-center gap-3 pt-6">
-        <Avatar name={review.name} picture={review.picture} />
+        <Avatar name={review.name} />
         <div className="min-w-0">
-          <div className="truncate font-semibold">{review.name ?? 'לקוח/ה מפייסבוק'}</div>
+          {/* dir="auto": a Latin name in this RTL page would otherwise lose its first letters */}
+          <div dir="auto" className="break-words text-right font-semibold leading-tight">{name}</div>
           <div className="text-sm text-gray-400">{dateFormat.format(new Date(review.createdTime))}</div>
         </div>
-        <FaFacebook className="ms-auto h-5 w-5 shrink-0 text-[#1877F2]" aria-label="ביקורת מפייסבוק" />
+        <a
+          href={review.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`הביקורת של ${name} בפייסבוק`}
+          title="לביקורת בפייסבוק"
+          className="ms-auto shrink-0 rounded-full p-1 text-[#1877F2] transition-transform hover:scale-110"
+        >
+          <FaFacebook className="h-5 w-5" />
+        </a>
       </footer>
     </article>
   );
 }
 
-function Avatar({ name, picture }: { name: string | null; picture: string | null }) {
-  const [broken, setBroken] = useState(false);
+const AVATAR_COLORS = ['bg-sunset/80', 'bg-sky-600/80', 'bg-emerald-600/80', 'bg-violet-600/80', 'bg-amber-600/80'];
 
-  if (picture && !broken) {
-    return (
-      <img
-        src={picture}
-        alt=""
-        loading="lazy"
-        referrerPolicy="no-referrer"
-        onError={() => setBroken(true)}
-        className="h-11 w-11 shrink-0 rounded-full object-cover"
-      />
-    );
-  }
+// Facebook's picture URLs expire, so every reviewer gets an initial in a colour of their own
+function Avatar({ name }: { name: string | null }) {
+  const letter = name?.trim()[0]?.toUpperCase() ?? '★';
+  const color = AVATAR_COLORS[[...(name ?? '')].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % AVATAR_COLORS.length];
 
   return (
-    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sunset/80 text-lg font-bold">
-      {name?.trim()[0] ?? '★'}
-    </div>
-  );
-}
-
-// Fallback while the reviews API is unavailable (e.g. token not configured yet)
-function ElfsightReviews() {
-  useEffect(() => {
-    if (document.querySelector('script[src*="static.elfsight.com/platform"]')) return;
-    const script = document.createElement('script');
-    script.src = 'https://static.elfsight.com/platform/platform.js';
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
-
-  return (
-    <div className="relative widget-container overflow-hidden px-6">
-      <div className={`elfsight-app-${ELFSIGHT_APP_ID} w-full`} data-elfsight-app-lazy></div>
+    <div
+      aria-hidden="true"
+      className={clsx('flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-lg font-bold', color)}
+    >
+      {letter}
     </div>
   );
 }

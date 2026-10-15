@@ -1,6 +1,11 @@
 // Single source of truth for the pre-rendered HTML (see scripts/prerender.mjs).
 // Everything here must match what the React components actually say — the point
 // is to show crawlers the real page, not a separate marketing text.
+import { readFileSync } from 'node:fs';
+
+// The Facebook reviews snapshot the Testimonials carousel shows (scripts/fetch-reviews.mjs)
+const reviews = JSON.parse(readFileSync(new URL('../src/data/reviews.json', import.meta.url), 'utf8'));
+const QUOTED_REVIEWS = 5;
 
 export const site = {
   url: 'https://vento-motors.com',
@@ -104,6 +109,15 @@ export function buildBody() {
 
         <ul class="mt-12 flex flex-wrap justify-center gap-8">
         ${stats.map(([n, label]) => `<li><strong>${escapeHtml(n)}</strong> ${escapeHtml(label)}</li>`).join('\n        ')}
+        </ul>
+
+        <h2 class="mt-12 text-2xl font-bold">מה הלקוחות אומרים</h2>
+        <p class="mt-4">${reviews.length} ביקורות בפייסבוק: <a href="https://www.facebook.com/ventomotors/reviews">לכל הביקורות</a></p>
+        <ul class="mt-4 space-y-2 text-right">
+        ${reviews
+          .slice(0, QUOTED_REVIEWS)
+          .map((r) => `<li><blockquote>${escapeHtml(r.text)}</blockquote> <cite>${escapeHtml(r.name || 'לקוח/ה מפייסבוק')}</cite></li>`)
+          .join('\n        ')}
         </ul>
 
         <h2 class="mt-12 text-2xl font-bold">צור קשר</h2>

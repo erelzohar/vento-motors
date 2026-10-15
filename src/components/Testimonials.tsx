@@ -93,7 +93,8 @@ function ReviewsCarousel({ reviews }: { reviews: Review[] }) {
       <div
         ref={trackRef}
         onScroll={updateEdges}
-        className="flex gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2"
+        // items-start: an expanded card grows alone instead of stretching its neighbours
+        className="flex items-start gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-2"
       >
         {reviews.map((review) => <ReviewCard key={review.id} review={review} />)}
       </div>
@@ -134,7 +135,9 @@ function ReviewCard({ review }: { review: Review }) {
   const name = review.name ?? 'לקוח/ה מפייסבוק';
 
   return (
-    <article className="snap-start shrink-0 w-[85%] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] flex flex-col rounded-2xl bg-white/10 p-6 text-white backdrop-blur-sm">
+    // min-h fits the tallest collapsed card (stars, 5 clamped lines, "read more", a two-line name),
+    // so collapsed cards line up; only an expanded one grows past it
+    <article className="snap-start shrink-0 w-[85%] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] min-h-[21rem] flex flex-col rounded-2xl bg-white/10 p-6 text-white backdrop-blur-sm">
       {review.rating && (
         <div className="flex gap-1 text-yellow-400" aria-label={`${review.rating} כוכבים`}>
           {Array.from({ length: 5 }, (_, i) => (

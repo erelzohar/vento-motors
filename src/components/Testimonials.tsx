@@ -41,7 +41,7 @@ export function Testimonials() {
             href={FACEBOOK_REVIEWS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`${averageRating ? `דירוג ${averageRating.toFixed(1)} מתוך 5, ` : ''}${reviews.length} ביקורות בפייסבוק`}
+            aria-label={`${averageRating ? `דירוג ${averageRating.toFixed(1)} מתוך 5, ` : ''}ביקורות בפייסבוק`}
             className="mt-6 inline-flex items-center gap-2 text-white/80 transition-colors hover:text-white"
           >
             <FaFacebook className="h-5 w-5 text-[#1877F2]" />
@@ -51,7 +51,7 @@ export function Testimonials() {
                 {averageRating.toFixed(1)}
               </span>
             )}
-            <span>{reviews.length} ביקורות בפייסבוק</span>
+            <span>ביקורות בפייסבוק</span>
           </a>
         </div>
 

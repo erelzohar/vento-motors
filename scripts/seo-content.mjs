@@ -112,7 +112,7 @@ export function buildBody() {
         </ul>
 
         <h2 class="mt-12 text-2xl font-bold">מה הלקוחות אומרים</h2>
-        <p class="mt-4">${reviews.length} ביקורות בפייסבוק: <a href="https://www.facebook.com/ventomotors/reviews">לכל הביקורות</a></p>
+        <p class="mt-4">ביקורות בפייסבוק: <a href="https://www.facebook.com/ventomotors/reviews">לכל הביקורות</a></p>
         <ul class="mt-4 space-y-2 text-right">
         ${reviews
           .slice(0, QUOTED_REVIEWS)
